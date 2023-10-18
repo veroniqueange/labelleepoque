@@ -1,32 +1,31 @@
 <?php
-    session_start();
-    
-    // J'inclus une connexion vers la BDD
-    include('./model/db_connexion.php');
+session_start();
 
-    /************************************************************
-    *   Traitement des données SI la méthode est bien POST
-    ***************************************************************/    
-    if($_SERVER['REQUEST_METHOD'] === 'POST'){
-        $_POST = filter_input_array(
-            INPUT_POST,[
-                'marques' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-                'modeles' => FILTER_SANITIZE_FULL_SPECIAL_CHARS
-            ]
-        );
-        // Initialisation des variables qui vont recevoir les champs du formulaire
-        $marques = $_POST['marques'] ?? '';
-        $modeles = $_POST['modeles'] ?? '';
+// J'inclus une connexion vers la BDD
+include('./model/db_connexion.php');
 
-        
-        //  Faire requète SELECT 
-        if(!empty($marques) && !empty($modeles)){
+/************************************************************
+ *   Traitement des données SI la méthode est bien POST
+ ***************************************************************/
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+  $_POST = filter_input_array(
+    INPUT_POST,
+    [
+      'marques' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+      'modeles' => FILTER_SANITIZE_FULL_SPECIAL_CHARS
+    ]
+  );
+  // Initialisation des variables qui vont recevoir les champs du formulaire
+  $marques = $_POST['marques'] ?? '';
+  $modeles = $_POST['modeles'] ?? '';
 
-        }
-        else{
-            $message = "<span class='message'>Veuillez renseigner tous les champs !</span>";
-        }
-    }
+
+  //  Faire requète SELECT 
+  if (!empty($marques) && !empty($modeles)) {
+  } else {
+    $message = "<span class='message'>Veuillez renseigner tous les champs !</span>";
+  }
+}
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -49,11 +48,17 @@
         <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
           <li><a href="index.php" class="nav-link px-2 text-white">Accueil</a></li>
           <li><a href="#" class="nav-link px-2 text-white">Contact</a></li>
-          <li><a href="Pompiers.php" class="nav-link px-2 text-white">Pompiers</a></li>
+          <?php
+          if (isset($_SESSION['id_user'])) {
+          ?>
+            <li><a href="Pompiers.php" class="nav-link px-2 text-white">Pompiers</a></li>
+          <?php
+          }
+          ?>
         </ul>
         <div class="text-end">
           <?php
-          if (isset($_SESSION['id_user']) && $_SERVER['REQUEST_METHOD']) {
+          if (isset($_SESSION['id_user'])) {
           ?>
             <a href="deconnexion.php" class="btn btn-outline-light me-2">Déconnexion</a>
           <?php
@@ -70,89 +75,96 @@
   </header>
   <main>
     <div class="s01 text-center">
-      <form action="#" method="post">
-        <fieldset></fieldset>
-        <legend>La Belle Epoque</legend>
-        </fieldset>
-        <div class="inner-form">
-          <div class="input-field first-wrap">
-            <input id="marques" name="marques" type="text" placeholder="Marque" />
+      <?php
+      if (isset($_SESSION['id_user'])) {
+      ?>
+        <form action="#" method="post">
+          <fieldset></fieldset>
+          <legend>La Belle Epoque</legend>
+          </fieldset>
+          <div class="inner-form">
+            <div class="input-field first-wrap">
+              <input id="marques" name="marques" type="text" placeholder="Marque" />
+            </div>
+            <div class="input-field second-wrap">
+              <input id="modeles" name="modeles" type="text" placeholder="Modèle" />
+            </div>
+            <div class="input-field third-wrap">
+              <button class="btn-search" type="submit">Rechercher</button>
+            </div>
           </div>
-          <div class="input-field second-wrap">
-            <input id="modeles" name="modeles" type="text" placeholder="Modèle" />
-          </div>
-          <div class="input-field third-wrap">
-            <button class="btn-search" type="submit">Rechercher</button>
-          </div>
-        </div>
-      </form>
+        </form>
+      <?php
+      } else {
+      ?>
+        <h1 class="text-white">La Belle Epoque</h1>
+      <?php
+
+      }
+      ?>
+
     </div>
     <?php
     if (isset($_SESSION['id_user']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
     ?>
       <div class="px-4 py-5 my-5 text-center">
 
-<p><?php echo $message; ?></p>
-      </div>
-    <?php
-    } else {
-    ?>
-
-      <div class="px-4 py-5 my-5 text-center">
-        <img src="photo.png" alt="Ma photo" width="150px">
-        <h1 class="display-5 fw-bold text-body-emphasis">Qui suis-je </h1>
-        <div class="col-lg-6 mx-auto">
-          <p class="lead mb-4">Je m'appelle Véronique et je vous invite à embarquer avec moi.</p>
-
-          <p class="lead mb-4">Bienvenue dans mon voyage dans le temps.</p>
-
-          <p class="lead mb-4">Passionnée de voitures anciennes, j'ai créé ce site afin de partager ma passion avec d'autres personnes. Échanger, voire même découvrir de nouvelles voitures que je n'ai peut-être même jamais vues. Je vous invite à vous joindre à moi afin de pouvoir échanger, laisser des commentaires, partager des photos anciennes bien sûr, et voyager dans le monde de nos grands-parents ou arrière-grands-parents. Je pense qu'à notre époque, cela peut nous faire que du bien. N'hésitez pas à me dire si j'ai fait une erreur de date ou de référence d'un véhicule, car je débute vraiment. Avant, je les regardais passer et voilà ! À présent, je peux prendre des photos et les partager avec un grand nombre de personnes, qui parfois n'ont pas le temps ou le courage de se constituer un album sans fin sur le net.
-          </p>
-
-        </div>
-      </div>
-      <div class="album py-5 bg-body-tertiary">
-        <div class="container">
-          <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
-
-            <?php
-            // Creer un tableau associatif avec du texte et des images 
-
-            $data_Station = array("assets/img/Station/Sans_titre-16.jpg", "assets/img/Station/Sans_titre-20.jpg", "assets/img/Station/Sans_titre-18.jpg", "assets/img/Station/Sans_titre-12.jpg", "assets/img/Station/Sans_titre-19.jpg", "assets/img/Station/Sans_titre-14.jpg",);
-            $arrlength = count($data_Station);
-            for ($i = 0; $i < $arrlength; $i++) {
-            ?>
-
-              <div class="col">
-                <div class="card shadow-sm">
-                  <img src="<?php echo $data_Station[$i] ?>">
-                  <div class="card-body">
-                    <p class="card-text">Le Lorem Ipsum.</p>
-                    <p class="card-text">Le Lorem Ipsum est simplement</p>
-                    <p class="card-text">Le Lorem Ipsum est simplement du faux.</p>
-                    <div class="d-flex justify-content-between align-items-center">
-                      <div class="btn-group">
-                        <button type="button" class="btn btn-sm btn-outline-secondary">View</button>
-                        <button type="button" class="btn btn-sm btn-outline-secondary">Edit</button>
-                      </div>
-                      <small class="text-body-secondary">9 mins</small>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-
-            <?php
-            }
-            ?>
-          </div>
-        </div>
+        <p><?php echo $message; ?></p>
       </div>
     <?php
     }
     ?>
 
+    <div class="px-4 py-5 my-5 text-center">
+      <img src="assets/img/photo.png" alt="Ma photo" width="150px">
+      <h1 class="display-5 fw-bold text-body-emphasis">Qui suis-je </h1>
+      <div class="col-lg-6 mx-auto">
+        <p class="lead mb-4">Je m'appelle Véronique et je vous invite à embarquer avec moi.</p>
 
+        <p class="lead mb-4">Bienvenue dans mon voyage dans le temps.</p>
+
+        <p class="lead mb-4">Passionnée de voitures anciennes, j'ai créé ce site afin de partager ma passion avec d'autres personnes. Échanger, voire même découvrir de nouvelles voitures que je n'ai peut-être même jamais vues. Je vous invite à vous joindre à moi afin de pouvoir échanger, laisser des commentaires, partager des photos anciennes bien sûr, et voyager dans le monde de nos grands-parents ou arrière-grands-parents. Je pense qu'à notre époque, cela peut nous faire que du bien. N'hésitez pas à me dire si j'ai fait une erreur de date ou de référence d'un véhicule, car je débute vraiment. Avant, je les regardais passer et voilà ! À présent, je peux prendre des photos et les partager avec un grand nombre de personnes, qui parfois n'ont pas le temps ou le courage de se constituer un album sans fin sur le net.
+        </p>
+
+      </div>
+    </div>
+    <div class="album py-5 bg-body-tertiary">
+      <div class="container">
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+
+          <?php
+          // Creer un tableau associatif avec du texte et des images 
+
+          $data_Station = array("assets/img/Station/Sans_titre-16.jpg", "assets/img/Station/Sans_titre-20.jpg", "assets/img/Station/Sans_titre-18.jpg", "assets/img/Station/Sans_titre-12.jpg", "assets/img/Station/Sans_titre-19.jpg", "assets/img/Station/Sans_titre-14.jpg",);
+          $arrlength = count($data_Station);
+          for ($i = 0; $i < $arrlength; $i++) {
+          ?>
+
+            <div class="col">
+              <div class="card shadow-sm">
+                <img src="<?php echo $data_Station[$i] ?>">
+                <div class="card-body">
+                  <p class="card-text">Le Lorem Ipsum.</p>
+                  <p class="card-text">Le Lorem Ipsum est simplement</p>
+                  <p class="card-text">Le Lorem Ipsum est simplement du faux.</p>
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div class="btn-group">
+                      <button type="button" class="btn btn-sm btn-outline-secondary">View</button>
+                      <button type="button" class="btn btn-sm btn-outline-secondary">Edit</button>
+                    </div>
+                    <small class="text-body-secondary">9 mins</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+
+          <?php
+          }
+          ?>
+        </div>
+      </div>
+    </div>
   </main>
   <!-- Footer -->
   <footer class="text-center text-lg-start bg-whith text-muted">
