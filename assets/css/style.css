@@ -7,13 +7,14 @@
     -ms-flex-align: center;
         align-items: center;
     font-family: 'Poppins', sans-serif;
-    background: #000;
+    background: rgba(0, 0, 0, 0.5);
     padding: 15px;
   }
   
   .s01 form {
     width: 100%;
     max-width: 1290px;
+ 
   }
   
   .s01 form legend {
@@ -24,7 +25,7 @@
   }
   
   .s01 form .inner-form {
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(7, 7, 7, 0.5);
     padding: 50px 47px;
     display: -ms-flexbox;
     display: flex;
@@ -52,7 +53,7 @@
   }
   
   .s01 form .inner-form .input-field input.placeholder {
-    color: #9a9a9a;
+    color: #fb1e1e;
     font-size: 20px;
   }
   
@@ -62,7 +63,7 @@
   }
   
   .s01 form .inner-form .input-field input::-webkit-input-placeholder {
-    color: #9a9a9a;
+    color:  #9a9a9a;
     font-size: 20px;
   }
   
@@ -149,3 +150,7 @@
       font-size: 16px;
     }
   }
+  .nav-item{
+    right: 150px;
+  }
+

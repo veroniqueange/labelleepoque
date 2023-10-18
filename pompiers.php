@@ -1,36 +1,14 @@
+
 <?php
-    session_start();
+session_start();
     
-    // J'inclus une connexion vers la BDD
-    include('./model/db_connexion.php');
+// J'inclus une connexion vers la BDD
+include('./model/db_connexion.php');
 
-    /************************************************************
-    *   Traitement des données SI la méthode est bien POST
-    ***************************************************************/    
-    if($_SERVER['REQUEST_METHOD'] === 'POST'){
-        $_POST = filter_input_array(
-            INPUT_POST,[
-                'marques' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-                'modeles' => FILTER_SANITIZE_FULL_SPECIAL_CHARS
-            ]
-        );
-        // Initialisation des variables qui vont recevoir les champs du formulaire
-        $marques = $_POST['marques'] ?? '';
-        $modeles = $_POST['modeles'] ?? '';
-
-        
-        //  Faire requète SELECT 
-        if(!empty($marques) && !empty($modeles)){
-
-        }
-        else{
-            $message = "<span class='message'>Veuillez renseigner tous les champs !</span>";
-        }
-    }
 ?>
-<!DOCTYPE html>
-<html lang="fr">
 
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -38,7 +16,6 @@
   <link rel="stylesheet" href="assets/css/style.css">
   <title>La Belle Epoque</title>
 </head>
-
 <body>
   <header class="p-3 text" style="background-color:rgba(0, 0, 0, 50)">
     <div class="container">
@@ -118,7 +95,7 @@
             <?php
             // Creer un tableau associatif avec du texte et des images 
 
-            $data_Station = array("assets/img/Station/Sans_titre-16.jpg", "assets/img/Station/Sans_titre-20.jpg", "assets/img/Station/Sans_titre-18.jpg", "assets/img/Station/Sans_titre-12.jpg", "assets/img/Station/Sans_titre-19.jpg", "assets/img/Station/Sans_titre-14.jpg",);
+            $data_Station = array("assets/img/POMPIERS/Sans titre - 1.jpg","assets/img/POMPIERS/Sans titre 2.jpgassets/img/POMPIERS/Sans titre - 3.jpg","assets/img/POMPIERS/Sans titre - 4.jpg","assets/img/POMPIERS/Sans titre - 5.jpg","assets/img/POMPIERS/Sans titre - 6.jpg","assets/img/POMPIERS/Sans titre - 7.jpg","assets/img/POMPIERS/Sans titre - 8.jpg","assets/img/POMPIERS/Sans titre - 9.jpg","assets/img/POMPIERS/Sans titre - 10.jpg","assets/img/POMPIERS/Sans titre-11.jpg");
             $arrlength = count($data_Station);
             for ($i = 0; $i < $arrlength; $i++) {
             ?>
@@ -198,7 +175,7 @@
           <div class="col-md-3 col-lg-4 col-xl-3 mx-auto mb-4">
             <!-- Content -->
             <h6 class="text-uppercase fw-bold mb-4">
-              <i class="fas fa-gem me-3"></i>Belle Epoque
+              <i class="fas fa-gem me-3"></i>LA Belle Epoque
             </h6>
             <p>
               Une nouvelle histoire dans le monde de nos grands-parents ou arrière-grands-parents.
@@ -284,5 +261,4 @@
   <!-- Footer -->
   <script src="node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-
 </html>

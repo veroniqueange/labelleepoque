@@ -1,104 +1,83 @@
-<?php
-// J'inclus une connexion vers la BDD
-include('./model/db_connexion.php');
+<?php 
+    session_start();
+    
+    // J'inclus une connexion vers la BDD
+    include('./model/db_connexion.php');
 
-/************************************************************
- *   Création de constantes qui contiennent les erreurs possibles
- ***************************************************************/
-const ERROR_REQUIRED = 'Veuillez renseigner ce champs.';
-const ERROR_PASSWORD_NUMBER_OF_CHARACTERS = 'Le mot de passe doit contenir 10 caractères minimum.';
-const ERROR_PASSWORD_DIFF = 'Les deux mots de passe sont différents.';
+    /************************************************************
+    *   Création de constantes qui contiennent les erreurs possibles
+    ***************************************************************/
+    const ERROR_REQUIRED = 'Veuillez renseigner ce champs.';
+    const ERROR_PASSWORD_NUMBER_OF_CHARACTERS = 'Le mot de passe doit contenir 10 caractères minimum.';
+   
+    /************************************************************
+    *   Initialisation d'un tableau contenant les erreurs possibles lors des saisies
+    ***************************************************************/
+    $errors = [
+        'login' => '',
+        'passwd' => '',
+    ];
+    $message = '';
 
-/************************************************************
- *   Initialisation d'un tableau contenant les erreurs possibles lors des saisies
- ***************************************************************/
-$errors = [
-    'login' => '',
-    'passwd' => '',
-    'mail' => '',
-    'cpasswd' => '',
-];
-$message = '';
-
-/************************************************************
- *   Traitement des données SI la méthode est bien POST
- ***************************************************************/
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $_POST = filter_input_array(
-        INPUT_POST,
-        [
-            'login' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-            'passwd' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-            'mail' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-            'cpasswd' => FILTER_SANITIZE_FULL_SPECIAL_CHARS
-        ]
-    );
-    // Initialisation des variables qui vont recevoir les champs du formulaire
-    $login = $_POST['login'] ?? '';
-    $passwd = $_POST['passwd'] ?? '';
-    $mail = $_POST['mail'] ?? '';
-    $cpasswd = $_POST['cpasswd']?? '';
-
-
-    // Remplissage du tableau concernant les erreurs possibles
-    if (!$login) {
-        $errors['login'] = ERROR_REQUIRED;
-    } elseif (!$mail) {
-        $errors['mail'] = ERROR_REQUIRED;
-    } elseif (!$passwd) {
-        $errors['passwd'] = ERROR_REQUIRED;
-    } elseif (mb_strlen($passwd) < 10) {
-        $errors['passwd'] = ERROR_PASSWORD_NUMBER_OF_CHARACTERS;
-    } elseif ($cpasswd!== $_POST['cpasswd']) {
-        $errors['cpasswd'] = ERROR_PASSWORD_DIFF;
-    }
-
-    // Execution de la requète INSERT into
-    // BDD_BELLE_EPOQUE: Ajouter la condition de 10 caractères sur le mdp
-    if (($login) && !empty($login) && ($passwd) && !empty($passwd) && (mb_strlen($passwd) >= 10) && ($passwd === $cpasswd)) {
-        $sql = 'SELECT login FROM user WHERE login = :login';
-        $db_statement = $db_connexion->prepare($sql);
-        $db_statement->execute(
-            array(':login' => $login)
+    /************************************************************
+    *   Traitement des données SI la méthode est bien POST
+    ***************************************************************/    
+    if($_SERVER['REQUEST_METHOD'] === 'POST'){
+        $_POST = filter_input_array(
+            INPUT_POST,[
+                'login' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+                'passwd' => FILTER_SANITIZE_FULL_SPECIAL_CHARS
+            ]
         );
+        // Initialisation des variables qui vont recevoir les champs du formulaire
+        $login = $_POST['login'] ?? '';
+        $passwd = $_POST['passwd'] ?? '';
 
-        // Si l'exécution de la requète retourne une valeur <= 0, alors on traite la demande
-        $nb = $db_statement->rowCount();
-        if ($nb <= 0) {
-            // exécution de la requète INSERT INTO
-            $rqt = "INSERT INTO user(id_user, login, passwd, mail) VALUES (DEFAULT, :login, :passwd, :mail)";
+        // Remplissage du tableau concernant les erreurs possibles
+        if(!$login){
+            $errors['login'] = ERROR_REQUIRED;
+        }
+        if(!$passwd){
+            $errors['passwd'] = ERROR_REQUIRED;
+        }
+        /**  elseif = if */
+        if(mb_strlen($passwd) < 10){
+            $errors['passwd'] = ERROR_PASSWORD_NUMBER_OF_CHARACTERS;
+        }
+
+        //  Faire requète SELECT 
+        if(!empty($login) && !empty($passwd)){
+            /**
+             * On vérifie si le login et le mdp existent dans la base de données
+             */
+            $rqt = 'SELECT * FROM user WHERE login = :login';
             $db_statement = $db_connexion->prepare($rqt);
             $db_statement->execute(
                 array(
-                    ':login' => $login,
-                    ':passwd' => password_hash($passwd, PASSWORD_DEFAULT),
-                    ':mail' => $mail,
+                    ':login' => $login
                 )
             );
-            $message = "
-                    <span class='message'>
-                        Votre compte est créé ! Aller sur la page \" Se connecter \" et connectez-vous avec vos identifiants !
-                    </span>
-                ";
-        } else {
-            $message = "
-                    <span class='message'>
-                        Le login existe déjà !
-                    </span>
-                ";
+            /**
+             * Je récupère un tableau associatif
+             */
+            $data = $db_statement->fetch(PDO::FETCH_ASSOC);
+            /**
+             * Vérification du mot de passe
+             */
+            if(password_verify($passwd, $data['passwd'])){
+                $_SESSION['id_user'] = $data['id_user'];
+                header('location:index.php');
+                exit();
+            }
+            else{
+                $message = "<span class='message'>Mot de passe incorrect !</span>";
+            }
         }
-    } else {
-        $message = "
-                <span class='message'>
-                Veuillez renseigner tous les champs !
-                </span>
-            ";
+        else{
+            $message = "<span class='message'>Veuillez renseigner tous les champs !</span>";
+        }
     }
-}
-
-
 ?>
-
 <!DOCTYPE html>
 <html lang="fr">
 
@@ -106,7 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
-    <title>Inscription</title>
+    <title>Connexion</title>
     <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
@@ -124,8 +103,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <li><a href=" #" class="nav-link px-2 text-white">Contact</a></li>
                 </ul>
                 <div class="text-end">
-                    <a href="connexion.php" class="btn btn-outline-light me-2">Connexion</a>
-                    <a href="#" class="btn btn-outline-warning">Inscription</a>
+                    <a href="#" class="btn btn-outline-light me-2">Connexion</a>
+                    <a href="creat_account.php" class="btn btn-outline-warning">Inscription</a>
 
                 </div>
             </div>
@@ -133,7 +112,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </header>
     <main>
         <div class="s01 text-center">
-            <h1 class="text-white">Inscrivez-vous !</h1>
+        <h1 class="text-white">Connectez-vous !</h1>
         </div>
         <!-- Formulaire de connexion -->
         <section class="container mt-4">
@@ -152,36 +131,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 </div>
                                 <div class="col">
                                     <div class="form-outline">
-                                        <input type="email" name="mail" id="mail" class="form-control" />
-                                        <label class="form-label" for="mail">Email</label>
-                                        <?= $errors['mail'] ? '<p class="text-error">' . $errors['mail'] . '</p>' : '' ?>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row mb-4">
-                                <div class="col">
-                                    <div class="form-outline">
                                         <input type="password" name="passwd" id="passwd" class="form-control" />
                                         <label class="form-label" for="passwd">Mot de passe</label>
                                         <?= $errors['passwd'] ? '<p class="text-error">' . $errors['passwd'] . '</p>' : "" ?>
 
                                     </div>
                                 </div>
-                                <div class="col">
-                                    <div class="form-outline">
-                                        <input type="password" name="cpasswd" id="cpasswd" class="form-control" />
-                                        <label class="form-label" for="cpasswd">Confirmation Mdp</label>
-                                        <?= $errors['cpasswd'] ? '<p class="text-error">' . $errors['cpasswd'] . '</p>' : "" ?>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Checkbox -->
-                            <div class="form-check d-flex justify-content-center mb-4">
-                                <input class="form-check-input me-2" type="checkbox" value="" id="form6Example8" checked />
-                                <label class="form-check-label" for="form6Example8"> Créer un compte ? </label>
-                            </div>
-
+                            </div> 
+                            <div class="d-flex justify-content-center mb-4">                                
+                                <a href="motpasseperdu.php"> Mot de passe perdu ? </a>
+                            </div>               
                             <!-- Submit button -->
                             <button type="submit" class="btn btn-primary btn-block mb-4">Soumettre</button>
                         </form>
