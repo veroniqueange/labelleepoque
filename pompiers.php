@@ -7,10 +7,11 @@ include('./model/db_connexion.php');
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 
 <head>
     <meta charset="UTF-8">
+    <meta name= "description" content="Retrouver une série de véhicules de pompiers des deux siècles derniers">    
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="assets/css/style.css">
@@ -27,8 +28,12 @@ include('./model/db_connexion.php');
                 <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
                     <li><a href="index.php" class="nav-link px-2 text-white">Accueil</a></li>
                     <li><a href="#" class="nav-link px-2 text-white">Contact</a></li>
-                    <li><a href="Pompiers.php" class="nav-link px-2 text-white">Pompiers</a></li>
-                </ul>
+                    <li><a href="ford.php" class="nav-link px-2 text-white">Ford</a></li>
+          
+          <li><a href="citroën.php" class="nav-link px-2 text-white">Citroën</a></li>
+          <li><a href="lancia.php" class="nav-link px-2 text-white">Lancia</a></li> 
+              
+                        </ul>
                 <div class="text-end">
                     <?php
                     if (isset($_SESSION['id_user']) && $_SERVER['REQUEST_METHOD']) {
@@ -76,19 +81,7 @@ include('./model/db_connexion.php');
         } else {
         ?>
 
-            <div class="px-4 py-5 my-5 text-center">
-                <img src="assets/img/photo.png" alt="Ma photo" width="150px">
-                <h1 class="display-5 fw-bold text-body-emphasis">Qui suis-je </h1>
-                <div class="col-lg-6 mx-auto">
-                    <p class="lead mb-4">Je m'appelle Véronique et je vous invite à embarquer avec moi.</p>
-
-                    <p class="lead mb-4">Bienvenue dans mon voyage dans le temps.</p>
-
-                    <p class="lead mb-4">Passionnée de voitures anciennes, j'ai créé ce site afin de partager ma passion avec d'autres personnes. Échanger, voire même découvrir de nouvelles voitures que je n'ai peut-être même jamais vues. Je vous invite à vous joindre à moi afin de pouvoir échanger, laisser des commentaires, partager des photos anciennes bien sûr, et voyager dans le monde de nos grands-parents ou arrière-grands-parents. Je pense qu'à notre époque, cela peut nous faire que du bien. N'hésitez pas à me dire si j'ai fait une erreur de date ou de référence d'un véhicule, car je débute vraiment. Avant, je les regardais passer et voilà ! À présent, je peux prendre des photos et les partager avec un grand nombre de personnes, qui parfois n'ont pas le temps ou le courage de se constituer un album sans fin sur le net.
-                    </p>
-
-                </div>
-            </div>
+            
             <div class="album py-5 bg-body-tertiary">
                 <div class="container">
                     <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">

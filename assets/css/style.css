@@ -1,4 +1,8 @@
- .s01 {
+header{
+  background-color:rgba(0, 0, 0, 50);
+}
+
+.s01 {
     min-height: 20vh;
     display: -ms-flexbox;
     display: flex;

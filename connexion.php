@@ -1,82 +1,84 @@
-<?php 
-    session_start();
-    
-    // J'inclus une connexion vers la BDD
-    include('./model/db_connexion.php');
+<?php
+session_start();
 
-    /************************************************************
-    *   Création de constantes qui contiennent les erreurs possibles
-    ***************************************************************/
-    const ERROR_REQUIRED = 'Veuillez renseigner ce champs.';
-    const ERROR_PASSWORD_NUMBER_OF_CHARACTERS = 'Le mot de passe doit contenir 10 caractères minimum.';
-   
-    /************************************************************
-    *   Initialisation d'un tableau contenant les erreurs possibles lors des saisies
-    ***************************************************************/
-    $errors = [
-        'login' => '',
-        'passwd' => '',
-    ];
-    $message = '';
+// J'inclus une connexion vers la BDD
+include('./model/db_connexion.php');
 
-    /************************************************************
-    *   Traitement des données SI la méthode est bien POST
-    ***************************************************************/    
-    if($_SERVER['REQUEST_METHOD'] === 'POST'){
-        $_POST = filter_input_array(
-            INPUT_POST,[
-                'login' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-                'passwd' => FILTER_SANITIZE_FULL_SPECIAL_CHARS
-            ]
-        );
-        // Initialisation des variables qui vont recevoir les champs du formulaire
-        $login = $_POST['login'] ?? '';
-        $passwd = $_POST['passwd'] ?? '';
+/************************************************************
+ *   Création de constantes qui contiennent les erreurs possibles
+ ***************************************************************/
+const ERROR_REQUIRED = 'Veuillez renseigner ce champs.';
+const ERROR_PASSWORD_NUMBER_OF_CHARACTERS = 'Le mot de passe doit contenir 10 caractères minimum.';
 
-        // Remplissage du tableau concernant les erreurs possibles
-        if(!$login){
-            $errors['login'] = ERROR_REQUIRED;
-        }
-        if(!$passwd){
-            $errors['passwd'] = ERROR_REQUIRED;
-        }
-        /**  elseif = if */
-        if(mb_strlen($passwd) < 10){
-            $errors['passwd'] = ERROR_PASSWORD_NUMBER_OF_CHARACTERS;
-        }
+/************************************************************
+ *   Initialisation d'un tableau contenant les erreurs possibles lors des saisies
+ ***************************************************************/
+$errors = [
+    'login' => '',
+    'passwd' => '',
+];
+$message = '';
 
-        //  Faire requète SELECT 
-        if(!empty($login) && !empty($passwd)){
-            /**
-             * On vérifie si le login et le mdp existent dans la base de données
-             */
-            $rqt = 'SELECT * FROM user WHERE login = :login';
-            $db_statement = $db_connexion->prepare($rqt);
-            $db_statement->execute(
-                array(
-                    ':login' => $login
-                )
-            );
-            /**
-             * Je récupère un tableau associatif
-             */
-            $data = $db_statement->fetch(PDO::FETCH_ASSOC);
-            /**
-             * Vérification du mot de passe
-             */
-            if(password_verify($passwd, $data['passwd'])){
-                $_SESSION['id_user'] = $data['id_user'];
-                header('location:index.php');
-                exit();
-            }
-            else{
-                $message = "<span class='message'>Mot de passe incorrect !</span>";
-            }
-        }
-        else{
-            $message = "<span class='message'>Veuillez renseigner tous les champs !</span>";
-        }
+/************************************************************
+ *   Traitement des données SI la méthode est bien POST
+ ***************************************************************/
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $_POST = filter_input_array(
+        INPUT_POST,
+        [
+            'login' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+            'passwd' => FILTER_SANITIZE_FULL_SPECIAL_CHARS
+        ]
+    );
+    // Initialisation des variables qui vont recevoir les champs du formulaire
+    $login = $_POST['login'] ?? '';
+    $passwd = $_POST['passwd'] ?? '';
+
+    // Remplissage du tableau concernant les erreurs possibles
+    if (!$login) {
+        $errors['login'] = ERROR_REQUIRED;
     }
+    if (!$passwd) {
+        $errors['passwd'] = ERROR_REQUIRED;
+    }
+    /**  elseif = if */
+    if (mb_strlen($passwd) < 10) {
+        $errors['passwd'] = ERROR_PASSWORD_NUMBER_OF_CHARACTERS;
+    }
+
+    //  Faire requète SELECT 
+    if (!empty($login) && !empty($passwd)) {
+        /**
+         * On vérifie si le login et le mdp existent dans la base de données
+         */
+        $rqt = 'SELECT * FROM users WHERE login = :login';
+        $db_statement = $db_connexion->prepare($rqt);
+        $db_statement->execute(
+            array(':login' => $login)
+        );
+        /**
+         * Je récupère un tableau associatif
+         */
+        $data = $db_statement->fetch(PDO::FETCH_ASSOC);
+        /**
+         * Vérification du mot de passe
+         */
+
+        if ($data){
+        if (password_verify($passwd, $data['passwd'])) {
+            $_SESSION['id_user'] = $data['id_user'];
+            header('location:index.php');
+            exit();
+        } else {
+            $message = "<span class='message'>Mot de passe incorrect !</span>";
+        }
+    } else {
+        $message = "<span class='message'>Il n'y a aucun membre avec ce login !</span>";
+    }
+    } else {
+        $message = "<span class='message'>Veuillez renseigner tous les champs !</span>";
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -84,7 +86,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="">
+    <meta name="robots" content="index,follow">
+    <meta name="description" content="Page de connexion">
     <title>Connexion</title>
     <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="assets/css/style.css">
@@ -112,16 +115,16 @@
     </header>
     <main>
         <div class="s01 text-center">
-        <h1 class="text-white">Connectez-vous !</h1>
+            <h1 class="text-white">Connectez-vous !</h1>
         </div>
-        <!-- Formulaire de connexion -->
+       <!-- Formulaire de connexion -->
         <section class="container mt-4">
             <div class="form-container text-center">
                 <div class="row mb-4">
-                    <div class="col d-flex justify-content-center">                    
+                    <div class="col d-flex justify-content-center">
                         <form action="" method="POST">
-                        <p><?= $message ?></p>
-                            <div class="row mb-4">                            
+                            <p><?= $message ?></p>
+                            <div class="row mb-4">
                                 <div class="col">
                                     <div class="form-outline">
                                         <input type="text" name="login" id="login" class="form-control" />
@@ -137,10 +140,10 @@
 
                                     </div>
                                 </div>
-                            </div> 
-                            <div class="d-flex justify-content-center mb-4">                                
+                            </div>
+                            <div class="d-flex justify-content-center mb-4">
                                 <a href="motpasseperdu.php"> Mot de passe perdu ? </a>
-                            </div>               
+                            </div>
                             <!-- Submit button -->
                             <button type="submit" class="btn btn-primary btn-block mb-4">Soumettre</button>
                         </form>
@@ -149,9 +152,9 @@
             </div>
         </section>
     </main>
-   
-   <!-- Footer -->
- <footer class="text-center text-lg-start bg-whith text-muted">
+
+    <!-- Footer -->
+    <footer class="text-center text-lg-start bg-whith text-muted">
         <!-- Section: Social media -->
         <section class="d-flex justify-content-center justify-content-lg-between p-4 border-bottom">
             <!-- Left -->
@@ -197,8 +200,8 @@
                             <i class="fas fa-gem me-3"></i>Belle Epoque
                         </h6>
                         <p>
-                            Une nouvelle histoire dans le monde de nos grands-parents ou arrière-grands-parents.  
-              
+                            Une nouvelle histoire dans le monde de nos grands-parents ou arrière-grands-parents.
+
                         </p>
                     </div>
                     <!-- Grid column -->
@@ -211,15 +214,15 @@
                         </h6>
                         <p>
                             <a href="#!" class="text-reset">
-</a>
+                            </a>
                         </p>
                         <p>
                             <a href="#!" class="text-reset">Mon Espace Client
-</a>
+                            </a>
                         </p>
                         <p>
                             <a href="#!" class="text-reset">GERER MES COOKIES
-</a>
+                            </a>
                         </p>
                         <p>
                             <i class="fas fa-envelope me-3"></i>
@@ -238,10 +241,12 @@
                             Informations legales
                         </h6>
                         <p>
-                            <a href="#!" class="text-reset"></a> </p>
-                                                   
+                            <a href="#!" class="text-reset"></a>
+                        </p>
+
                         <p>
-                            <a href="#!" class="text-reset">Protection de la  vie privée et cookies</a></p>
+                            <a href="#!" class="text-reset">Protection de la vie privée et cookies</a>
+                        </p>
                         <p>
                             <a href="#!" class="text-reset">Accessibilité numérique</a>
                         </p>
@@ -257,9 +262,9 @@
                         <h6 class="text-uppercase fw-bold mb-4">Contact</h6>
                         <p><i class="fas fa-home me-3"></i> INFORMATIONS LEGALES</p>
                         <p><i class="fas fa-home me-3"></i> Conditions Générales d'Utilisation</p>
-                     
-                        <p><i class="fas fa-phone me-3"></i>   </p>
-                        <p><i class="fas fa-print me-3"></i>  </p>
+
+                        <p><i class="fas fa-phone me-3"></i> </p>
+                        <p><i class="fas fa-print me-3"></i> </p>
                     </div>
                     <!-- Grid column -->
                 </div>

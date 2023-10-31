@@ -32,6 +32,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <head>
   <meta charset="UTF-8">
+  <meta name="robots" content="index,follow">
+    <meta name="description" content="voitures des deux derniers siècles">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="assets/css/style.css">
@@ -39,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 
 <body>
-  <header class="p-3 text" style="background-color:rgba(0, 0, 0, 50)">
+  <header class="p-3 text" >
     <div class="container">
       <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
         <a href="index.php" class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none">
@@ -47,11 +49,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </a>
         <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
           <li><a href="index.php" class="nav-link px-2 text-white">Accueil</a></li>
-          <li><a href="#" class="nav-link px-2 text-white">Contact</a></li>
+          <li><a href="contact.php" class="nav-link px-2 text-white">Contact</a></li>
           <?php
           if (isset($_SESSION['id_user'])) {
           ?>
-            <li><a href="Pompiers.php" class="nav-link px-2 text-white">Pompiers</a></li>
+            <li><a href="pompiers.php" class="nav-link px-2 text-white">Pompiers</a></li>           
           <?php
           }
           ?>
@@ -95,7 +97,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           </div>
         </form>
       <?php
-      } else {
+      }
+       else {
       ?>
         <h1 class="text-white">La Belle Epoque</h1>
       <?php
